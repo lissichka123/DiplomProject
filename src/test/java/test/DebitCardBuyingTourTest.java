@@ -1,40 +1,37 @@
 package test;
 
-import org.junit.jupiter.api.*;
-
 import com.codeborne.selenide.logevents.SelenideLogger;
-import io.qameta.allure.selenide.AllureSelenide;
 import data.SQLHelper;
+import io.qameta.allure.selenide.AllureSelenide;
+import org.junit.jupiter.api.*;
 import page.MainPage;
 
 import static com.codeborne.selenide.Selenide.open;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static data.SQLHelper.cleanDatabase;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DebitCardBuyingTourTest {
-        MainPage mainPage;
+    MainPage mainPage;
 
-        @BeforeAll
-        static void setUpAll() {
-            SelenideLogger.addListener("Allure", new AllureSelenide());
-        }
+    @BeforeAll
+    static void setUpAll() {
+        SelenideLogger.addListener("Allure", new AllureSelenide());
+    }
 
-        @AfterAll
-        static void tearDownAll() {
-            SelenideLogger.removeListener("allure");
-        }
+    @AfterAll
+    static void tearDownAll() {
+        SelenideLogger.removeListener("allure");
+    }
 
-        @BeforeEach
-        void setUp() {
-            mainPage = open("http://localhost:8080/", MainPage.class);
-        }
+    @BeforeEach
+    void setUp() {
+        mainPage = open("http://localhost:8080/", MainPage.class);
+    }
 
-        @AfterEach
-        void tearDownAllDatabase() {
-            cleanDatabase();
-        }
+    @AfterEach
+    void tearDownAllDatabase() {
+        cleanDatabase();
+    }
 
     @Test
     @DisplayName("Purchase of a tour when filling out the form with valid debit card data APPROVED")
@@ -43,6 +40,48 @@ public class DebitCardBuyingTourTest {
         mainPage.enteringApprovedCard();
         mainPage.enteringValidCardValidityPeriod();
         mainPage.enteringValidOwner();
+        mainPage.enteringValidCVC();
+        mainPage.verifySuccessfulNotification("Операция одобрена Банком.");
+        var actualStatusLastLinePaymentRequestEntity = SQLHelper.getStatusLastLinePaymentRequestEntity();
+        var expectedStatus = "APPROVED";
+        assertEquals(actualStatusLastLinePaymentRequestEntity, expectedStatus);
+    }
+
+    @Test
+    @DisplayName("Buying a tour with valid cardholder with dot in name")
+    void payTurAPPROVEDCardOwnerWithDot() {
+        mainPage.chooseBy("Оплата по карте");
+        mainPage.enteringApprovedCard();
+        mainPage.enteringValidCardValidityPeriod();
+        mainPage.enteringNameWithDot();
+        mainPage.enteringValidCVC();
+        mainPage.verifySuccessfulNotification("Операция одобрена Банком.");
+        var actualStatusLastLinePaymentRequestEntity = SQLHelper.getStatusLastLinePaymentRequestEntity();
+        var expectedStatus = "APPROVED";
+        assertEquals(actualStatusLastLinePaymentRequestEntity, expectedStatus);
+    }
+
+    @Test
+    @DisplayName("Buying a tour with valid cardholder with dash in name")
+    void payTurAPPROVEDCardOwnerWithDash() {
+        mainPage.chooseBy("Оплата по карте");
+        mainPage.enteringApprovedCard();
+        mainPage.enteringValidCardValidityPeriod();
+        mainPage.enteringNameWithDash();
+        mainPage.enteringValidCVC();
+        mainPage.verifySuccessfulNotification("Операция одобрена Банком.");
+        var actualStatusLastLinePaymentRequestEntity = SQLHelper.getStatusLastLinePaymentRequestEntity();
+        var expectedStatus = "APPROVED";
+        assertEquals(actualStatusLastLinePaymentRequestEntity, expectedStatus);
+    }
+
+    @Test
+    @DisplayName("Buying a tour with valid cardholder with 3 letters in name")
+    void payTurAPPROVEDCardOwnerWithMinName() {
+        mainPage.chooseBy("Оплата по карте");
+        mainPage.enteringApprovedCard();
+        mainPage.enteringValidCardValidityPeriod();
+        mainPage.enteringMinName();
         mainPage.enteringValidCVC();
         mainPage.verifySuccessfulNotification("Операция одобрена Банком.");
         var actualStatusLastLinePaymentRequestEntity = SQLHelper.getStatusLastLinePaymentRequestEntity();
@@ -134,8 +173,9 @@ public class DebitCardBuyingTourTest {
         mainPage.verifyErrorOwnerField("Поле обязательно для заполнения");
         mainPage.verifyErrorCVCField("Неверный формат");
     }
-
-
-
-
 }
+
+
+
+
+

@@ -1,6 +1,5 @@
 package page;
 
-import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import data.DataHelper;
 
@@ -133,6 +132,18 @@ public class MainPage {
 
     public void enteringInValidCVC() {
         CVCField.setValue(DataHelper.generateInvalidCVC());
+    }
+
+    public void enteringNameWithDot() {
+        ownerField.setValue(DataHelper.generateNameWithDot("en"));
+    }
+
+    public void enteringNameWithDash() {
+        ownerField.setValue(DataHelper.generateNameWithDash("en"));
+    }
+
+    public void enteringMinName() {
+        ownerField.setValue(DataHelper.generateMinName("en"));
     }
 
 }
